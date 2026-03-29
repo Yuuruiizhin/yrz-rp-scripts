@@ -74,8 +74,9 @@ function renderPointsTable(points) {
             <td><span class="coords-mono">${fc(p.coords_x)}, ${fc(p.coords_y)}, ${fc(p.coords_z)}</span></td>
             <td>${p.creator_name ? escHtml(p.creator_name) : '<em style="color:var(--text-muted)">—</em>'}</td>
             <td><div class="action-btns">
-                <button class="btn btn-edit"   onclick="openEditModal(${p.id})">✏️ Editar</button>
-                <button class="btn btn-delete" onclick="openDeleteModal(${p.id},'${escHtml(p.name)}')">🗑️</button>
+                <button class="btn btn-edit"      onclick="openEditModal(${p.id})">✏️ Editar</button>
+                <button class="btn btn-duplicate" onclick="duplicatePoint(${p.id})">📄 Duplicar</button>
+                <button class="btn btn-delete"    onclick="openDeleteModal(${p.id},'${escHtml(p.name)}')">🗑️</button>
             </div></td>`;
         tbody.appendChild(tr);
     });
@@ -107,6 +108,7 @@ function renderCardsGrid(containerId, points) {
             </div>
             <div class="point-card-actions">
                 <button class="btn btn-edit" style="flex:1" onclick="openEditModal(${p.id})">✏️ Editar</button>
+                <button class="btn btn-duplicate" onclick="duplicatePoint(${p.id})">📄 Duplicar</button>
                 <button class="btn btn-delete" onclick="openDeleteModal(${p.id},'${escHtml(p.name)}')">🗑️</button>
             </div>`;
         c.appendChild(card);
@@ -162,6 +164,28 @@ function closeFormModal() {
     editingId = null;
     // NO liberar foco — admin panel sigue abierto
 }
+
+function duplicatePoint(id) {
+    const p = allPoints.find(x => x.id === id);
+    if (!p) {
+        showToast('Punto no encontrado para duplicar.', 'error');
+        return;
+    }
+
+    const newPoint = {
+        name: `${p.name} (copia)`,
+        category: p.category,
+        job: p.job || '',
+        coords: { x: parseFloat(p.coords_x), y: parseFloat(p.coords_y), z: parseFloat(p.coords_z) },
+        max_weight: p.max_weight || 100000,
+        max_slots: p.max_slots || 50,
+        products: Array.isArray(p.products) ? p.products.map(product => ({ ...product })) : [],
+    };
+
+    nuiPost('admin:createPoint', newPoint);
+    showToast('Duplicando punto...');
+}
+
 
 function useCurrentCoords() {
     document.getElementById('form-x').value = fc(playerCoords.x);
