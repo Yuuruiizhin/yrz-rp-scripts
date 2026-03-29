@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OX Stash & Store</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     SHOP UI
+════════════════════════════════════════════ -->
+<div id="shop-overlay" class="overlay hidden">
+    <div id="shop-panel" class="panel shop-panel">
+        <div class="panel-header shop-header">
+            <div class="header-icon">🛒</div>
+            <div class="header-info">
+                <h2 id="shop-title">Tienda</h2>
+                <span class="header-sub">Selecciona un producto</span>
+            </div>
+            <button class="close-btn" onclick="closeShop()">✕</button>
+        </div>
+        <div class="panel-body">
+            <div id="shop-products" class="products-grid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     QUANTITY MODAL
+════════════════════════════════════════════ -->
+<div id="qty-overlay" class="overlay hidden">
+    <div class="modal qty-modal">
+        <h3 id="qty-title">Cantidad</h3>
+        <p id="qty-subtitle" class="qty-subtitle"></p>
+        <div class="qty-controls">
+            <button class="qty-btn" onclick="changeQty(-1)">−</button>
+            <input id="qty-input" type="number" min="1" max="999" value="1">
+            <button class="qty-btn" onclick="changeQty(1)">+</button>
+        </div>
+        <div id="qty-total" class="qty-total">Total: $0</div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeQtyModal()">Cancelar</button>
+            <button class="btn btn-confirm" onclick="confirmBuy()">Comprar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STASH UI
+════════════════════════════════════════════ -->
+<div id="stash-overlay" class="overlay hidden">
+    <div id="stash-panel" class="panel stash-panel">
+        <div class="panel-header stash-header">
+            <div class="header-icon">📦</div>
+            <div class="header-info">
+                <h2 id="stash-title">Almacén</h2>
+                <span class="header-sub">Transfiere items entre inventarios</span>
+            </div>
+            <div class="stash-qty-box">
+                <label for="stash-qty-input">Cantidad:</label>
+                <input id="stash-qty-input" type="number" min="1" value="1" class="stash-qty-input" />
+                <button class="stash-qty-btn" onclick="applyStashQtyDefault()">Fijar</button>
+            </div>
+            <button class="close-btn" onclick="closeStash()">✕</button>
+        </div>
+        <div class="panel-body">
+            <div class="stash-container">
+                <div class="inventory-section stash-section">
+                    <h3>Almacén</h3>
+                    <div id="stash-items" class="items-grid"></div>
+                </div>
+                <div class="inventory-section player-section">
+                    <h3>Tu Inventario</h3>
+                    <div id="player-items" class="items-grid"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     STASH QTY MODAL
+════════════════════════════════════════════ -->
+<div id="stash-qty-overlay" class="overlay hidden">
+    <div class="modal stash-qty-modal">
+        <h3 id="stash-qty-title">Mover item</h3>
+        <p id="stash-qty-subtitle" class="qty-subtitle">Define la cantidad y confirma</p>
+        <div class="qty-controls">
+            <button class="qty-btn" onclick="changeStashQty(-1)">−</button>
+            <input id="stash-qty-modal-input" type="number" min="1" value="1" />
+            <button class="qty-btn" onclick="changeStashQty(1)">+</button>
+        </div>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeStashQtyModal()">Cancelar</button>
+            <button class="btn btn-confirm" onclick="confirmStashTransfer()">Transferir</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     ADMIN PANEL
+════════════════════════════════════════════ -->
+<div id="admin-overlay" class="overlay hidden">
+    <div id="admin-panel" class="panel admin-panel">
+
+        <!-- Sidebar -->
+        <div class="admin-sidebar">
+            <div class="sidebar-logo">
+                <span class="logo-icon">⚙</span>
+                <span class="logo-text">ADMIN<br><small>Panel</small></span>
+            </div>
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="points" onclick="switchTab('points')">
+                    <span class="nav-icon">📍</span>
+                    <span>Puntos</span>
+                </button>
+                <button class="nav-item" data-tab="stashes" onclick="switchTab('stashes')">
+                    <span class="nav-icon">📦</span>
+                    <span>Stashes</span>
+                </button>
+                <button class="nav-item" data-tab="shops" onclick="switchTab('shops')">
+                    <span class="nav-icon">🛒</span>
+                    <span>Tiendas</span>
+                </button>
+            </nav>
+            <button class="btn btn-close-admin" onclick="closeAdmin()">✕ Cerrar</button>
+        </div>
+
+        <!-- Main Content -->
+        <div class="admin-content">
+
+            <!-- Tab: Todos los puntos -->
+            <div id="tab-points" class="tab-pane active">
+                <div class="content-header">
+                    <h2>📍 Todos los Puntos</h2>
+                    <button class="btn btn-create" onclick="openCreateModal()">+ Nuevo Punto</button>
+                </div>
+                <div class="search-bar">
+                    <input type="text" id="search-input" placeholder="🔍 Buscar por nombre, ID o job..." oninput="filterPoints()">
+                </div>
+                <div id="points-table-wrap" class="table-wrap">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Job</th>
+                                <th>Coordenadas</th>
+                                <th>Creador</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="points-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Stashes -->
+            <div id="tab-stashes" class="tab-pane">
+                <div class="content-header">
+                    <h2>📦 Almacenamientos</h2>
+                    <button class="btn btn-create" onclick="openCreateModal('stash')">+ Nuevo Stash</button>
+                </div>
+                <div id="stashes-grid" class="cards-grid"></div>
+            </div>
+
+            <!-- Tab: Shops -->
+            <div id="tab-shops" class="tab-pane">
+                <div class="content-header">
+                    <h2>🛒 Tiendas</h2>
+                    <button class="btn btn-create" onclick="openCreateModal('shop')">+ Nueva Tienda</button>
+                </div>
+                <div id="shops-grid" class="cards-grid"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     CREATE / EDIT MODAL
+════════════════════════════════════════════ -->
+<div id="form-overlay" class="overlay hidden">
+    <div class="modal form-modal">
+        <div class="modal-header">
+            <h3 id="form-title">Nuevo Punto</h3>
+            <button class="close-btn" onclick="closeFormModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="form-id">
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Nombre <span class="required">*</span></label>
+                    <input type="text" id="form-name" placeholder="Ej: Almacén Mecánico">
+                </div>
+                <div class="form-group">
+                    <label>Categoría <span class="required">*</span></label>
+                    <select id="form-category" onchange="onCategoryChange()">
+                        <option value="stash">📦 Almacenamiento (Stash)</option>
+                        <option value="shop">🛒 Tienda (Shop)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Job Requerido</label>
+                    <input type="text" id="form-job" placeholder="mechanic / police (vacío = público)">
+                </div>
+                <div class="form-group stash-only">
+                    <label>Peso Máximo (g)</label>
+                    <input type="number" id="form-weight" value="100000" min="1000">
+                </div>
+                <div class="form-group stash-only">
+                    <label>Slots Máximos</label>
+                    <input type="number" id="form-slots" value="50" min="1">
+                </div>
+            </div>
+
+            <div class="coords-section">
+                <label>Coordenadas <span class="required">*</span></label>
+                <div class="coords-row">
+                    <input type="number" id="form-x" placeholder="X" step="0.0001">
+                    <input type="number" id="form-y" placeholder="Y" step="0.0001">
+                    <input type="number" id="form-z" placeholder="Z" step="0.0001">
+                    <button class="btn btn-coords" onclick="useCurrentCoords()" title="Usar posición actual">📍 Actual</button>
+                </div>
+            </div>
+
+            <!-- Sección de productos (solo shop) -->
+            <div id="products-section" class="products-section hidden">
+                <div class="products-header">
+                    <label>Productos de la Tienda</label>
+                    <button class="btn btn-add-product" onclick="addProductRow()">+ Agregar</button>
+                </div>
+                <div class="products-hint">Nombre del item debe coincidir con el registro en OX Inventory</div>
+                <div id="products-list" class="products-list">
+                    <div class="products-col-header">
+                        <span>Item Name (OX)</span>
+                        <span>Etiqueta</span>
+                        <span>Precio $</span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-cancel" onclick="closeFormModal()">Cancelar</button>
+            <button class="btn btn-save" onclick="savePoint()">💾 Guardar</button>
+        </div>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     DELETE CONFIRM MODAL
+════════════════════════════════════════════ -->
+<div id="delete-overlay" class="overlay hidden">
+    <div class="modal delete-modal">
+        <div class="delete-icon">🗑️</div>
+        <h3>¿Eliminar Punto?</h3>
+        <p id="delete-msg">Esta acción no se puede deshacer.</p>
+        <div class="modal-actions">
+            <button class="btn btn-cancel" onclick="closeDeleteModal()">Cancelar</button>
+            <button class="btn btn-delete" onclick="confirmDelete()">Eliminar</button>
+        </div>
+    </div>
+</div>
+
+<!-- TOAST NOTIFICATIONS -->
+<div id="toast-container"></div>
+
+<script src="js/app.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>
