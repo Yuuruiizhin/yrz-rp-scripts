@@ -4,20 +4,23 @@
 ============================================================ */
 
 :root {
-    --bg-dark:      #0a0c10;
-    --bg-panel:     #0f1117;
-    --bg-card:      #151820;
-    --bg-input:     #1a1e28;
-    --bg-hover:     #1e2433;
-    --bg-table-row: #131620;
+    --bg-dark:      #0d1015;
+    --bg-panel:     #11151b;
+    --bg-card:      #191f26;
+    --bg-input:     #1f2630;
+    --bg-hover:     #2a3240;
+    --bg-table-row: #1d242f;
 
-    --accent:       #00d4ff;
-    --accent-dim:   rgba(0, 212, 255, 0.15);
-    --accent-glow:  rgba(0, 212, 255, 0.4);
-    --accent-shop:  #f7931a;
-    --accent-shop-dim: rgba(247, 147, 26, 0.15);
-    --accent-green: #00e676;
-    --accent-red:   #ff3d57;
+    --bg-marble:    linear-gradient(140deg, rgba(255,255,255,0.03) 0%, rgba(0,0,0,0.03) 30%, rgba(255,255,255,0.02) 100%);
+    --bg-marble-subtle: linear-gradient(150deg, rgba(255,255,255,0.06), rgba(255,255,255,0));
+
+    --accent:       #94d2fd;
+    --accent-dim:   rgba(148, 210, 253, 0.16);
+    --accent-glow:  rgba(148, 210, 253, 0.35);
+    --accent-shop:  #ffb703;
+    --accent-shop-dim: rgba(255, 183, 3, 0.15);
+    --accent-green: #83c5be;
+    --accent-red:   #ef476f;
 
     --border:       rgba(0, 212, 255, 0.2);
     --border-shop:  rgba(247, 147, 26, 0.25);
@@ -52,9 +55,13 @@
 
 body {
     font-family: var(--font-main);
-    background: transparent;
+    background: linear-gradient(180deg, #0c0f14 0%, #10141c 45%, #0b0f13 100%);
     color: var(--text-primary);
     overflow: hidden;
+}
+
+.overlay {
+    background: rgba(6, 10, 16, 0.55);
 }
 
 /* ─── OVERLAYS ──────────────────────────────────────────── */
@@ -64,16 +71,25 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(0,0,0,0);
+    background: rgba(4, 8, 14, 0.65);
     z-index: 100;
-    animation: fadeIn 0.2s ease;
+    animation: fadeIn 0.18s ease;
 }
 
 .overlay.hidden { display: none !important; }
 
+.overlay.hiding {
+    animation: fadeOut 0.18s ease forwards;
+}
+
 @keyframes fadeIn {
     from { opacity: 0; }
     to   { opacity: 1; }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to   { opacity: 0; }
 }
 
 /* ─── PANELS ────────────────────────────────────────────── */
@@ -87,37 +103,68 @@ body {
     overflow: hidden;
 }
 
+.panel.hiding {
+    animation: slideOutDown 0.2s ease forwards;
+}
+
 @keyframes slideUp {
     from { opacity:0; transform: translateY(20px) scale(0.97); }
     to   { opacity:1; transform: translateY(0) scale(1); }
 }
 
+@keyframes slideOutDown {
+    from { opacity:1; transform: translateY(0) scale(1); }
+    to { opacity:0; transform: translateY(25px) scale(0.98); }
+}
+
+@keyframes slideInLeft {
+    from { opacity:0; transform: translateX(-30px) scale(0.97); }
+    to   { opacity:1; transform: translateX(0) scale(1); }
+}
+
+@keyframes slideInRight {
+    from { opacity:0; transform: translateX(30px) scale(0.97); }
+    to   { opacity:1; transform: translateX(0) scale(1); }
+}
+
+@keyframes slideInBottom {
+    from { opacity:0; transform: translateY(30px) scale(0.97); }
+    to   { opacity:1; transform: translateY(0) scale(1); }
+}
+
 /* ─── SHOP PANEL ────────────────────────────────────────── */
 .shop-panel {
-    width: 520px;
-    max-height: 80vh;
+    width: 1000px;
+    height: 650px;
     display: flex;
     flex-direction: column;
     border-color: var(--border-shop);
     box-shadow: var(--shadow), 0 0 30px rgba(247,147,26,0.1);
+    animation: slideInLeft 0.3s cubic-bezier(0.22,1,0.36,1);
 }
 
 .shop-header {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 18px 20px;
-    background: linear-gradient(135deg, #1a1610 0%, #141014 100%);
+    padding: 16px 18px;
+    background: linear-gradient(135deg, #11131a 0%, #0f1218 100%);
     border-bottom: 1px solid var(--border-shop);
 }
 
 .shop-header .header-icon,
-.stash-header .header-icon { font-size: 1.8rem; }
+.stash-header .header-icon {
+    font-size: 1.5rem;
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+}
 
 .shop-header h2,
 .stash-header h2 {
     font-family: var(--font-title);
-    font-size: 1.3rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--accent-shop);
     letter-spacing: 1px;
@@ -197,28 +244,40 @@ body {
 /* ─── PRODUCTS GRID (SHOP) ──────────────────────────────── */
 .products-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
     gap: 10px;
+    align-items: start;
 }
 
 .product-card {
     background: var(--bg-card);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius);
-    padding: 14px;
+    padding: 12px;
     cursor: pointer;
-    transition: all var(--transition);
+    transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    min-height: 180px;
+    max-height: 220px;
+    overflow: hidden;
 }
 
 .product-image {
     width: 100%;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 8px;
+    height: 96px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: rgba(255,255,255,0.03);
+    margin-bottom: 6px;
+}
+
+.product-card:hover {
+    border-color: var(--accent-shop);
+    background: var(--accent-shop-dim);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.22);
 }
 
 .product-card:hover {
@@ -234,33 +293,45 @@ body {
     font-weight: 600;
     color: var(--text-primary);
     letter-spacing: 0.5px;
+    line-height: 1.2;
+    max-height: 2.4em;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .product-item {
     font-family: var(--font-mono);
     font-size: 0.7rem;
     color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .product-price {
     font-family: var(--font-title);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 700;
     color: var(--accent-shop);
-    margin-top: 4px;
+    margin-top: auto;
 }
 
-.product-price::before { content: '$ '; font-size: 0.75rem; opacity: 0.7; }
+.product-price::before { content: '$ '; font-size: 0.75rem; opacity: 0.8; }
 
 /* ─── QUANTITY MODAL ────────────────────────────────────── */
 .qty-modal {
     background: var(--bg-panel);
     border: 1px solid var(--border-shop);
     border-radius: var(--radius-lg);
-    padding: 28px 32px;
+    width: 400px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
     text-align: center;
-    min-width: 300px;
-    animation: slideUp 0.2s ease;
+    animation: slideInBottom 0.25s ease;
     box-shadow: var(--shadow), 0 0 20px rgba(247,147,26,0.1);
 }
 
@@ -271,7 +342,7 @@ body {
     color: var(--accent-shop);
     letter-spacing: 1px;
     text-transform: uppercase;
-    margin-bottom: 4px;
+    margin-bottom: 10px;
 }
 
 .qty-subtitle { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 20px; }
@@ -281,15 +352,15 @@ body {
     align-items: center;
     gap: 10px;
     justify-content: center;
-    margin-bottom: 14px;
+    margin-bottom: 20px;
 }
 
 .qty-btn {
-    width: 38px; height: 38px;
+    width: 40px; height: 40px;
     border: 1px solid var(--border-shop);
     background: var(--bg-card);
     color: var(--accent-shop);
-    font-size: 1.3rem;
+    font-size: 1.4rem;
     border-radius: var(--radius);
     cursor: pointer;
     transition: all var(--transition);
@@ -298,7 +369,7 @@ body {
 .qty-btn:hover { background: var(--accent-shop-dim); }
 
 #qty-input {
-    width: 70px;
+    width: 80px;
     text-align: center;
     background: var(--bg-input);
     border: 1px solid var(--border-shop);
@@ -320,10 +391,11 @@ body {
 
 /* ─── STASH PANEL ───────────────────────────────────────── */
 .stash-panel {
-    width: 1200px;
-    height: 80vh;
+    width: 1000px;
+    height: 650px;
     border-color: var(--border-stash);
     box-shadow: var(--shadow), var(--shadow-glow-stash);
+    animation: slideInRight 0.3s cubic-bezier(0.22,1,0.36,1);
 }
 
 .stash-header {
@@ -419,12 +491,13 @@ body {
 
 /* ─── ADMIN PANEL ───────────────────────────────────────── */
 .admin-panel {
-    width: 1050px;
-    height: 82vh;
+    width: 1000px;
+    height: 650px;
     display: flex;
     flex-direction: row;
     border-color: var(--border);
     box-shadow: var(--shadow), var(--shadow-glow);
+    animation: slideInBottom 0.3s cubic-bezier(0.22,1,0.36,1);
 }
 
 .admin-sidebar {
@@ -790,12 +863,12 @@ body {
     background: var(--bg-panel);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    width: 560px;
-    max-height: 85vh;
+    width: 800px;
+    height: 600px;
     display: flex;
     flex-direction: column;
     box-shadow: var(--shadow), var(--shadow-glow);
-    animation: slideUp 0.22s ease;
+    animation: slideInBottom 0.25s ease;
 }
 
 .modal-header {
@@ -1008,14 +1081,19 @@ body {
     background: var(--bg-panel);
     border: 1px solid rgba(255,61,87,0.3);
     border-radius: var(--radius-lg);
-    padding: 32px;
+    width: 400px;
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
     text-align: center;
-    min-width: 300px;
-    animation: slideUp 0.2s ease;
+    animation: slideInBottom 0.25s ease;
     box-shadow: var(--shadow), 0 0 20px rgba(255,61,87,0.1);
 }
 
-.delete-icon { font-size: 2.5rem; margin-bottom: 12px; }
+.delete-icon { font-size: 3rem; margin-bottom: 15px; }
 
 .delete-modal h3 {
     font-family: var(--font-title);
@@ -1024,10 +1102,10 @@ body {
     color: var(--accent-red);
     letter-spacing: 1px;
     text-transform: uppercase;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
 }
 
-.delete-modal p { font-size: 0.82rem; color: var(--text-secondary); margin-bottom: 22px; }
+.delete-modal p { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 25px; }
 
 .modal-actions { display: flex; gap: 10px; justify-content: center; }
 

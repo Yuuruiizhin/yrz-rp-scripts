@@ -20,10 +20,10 @@ function openAdmin(points, coords) {
 }
 
 function closeAdmin() {
-    // Cerrar todo primero
-    document.getElementById('form-overlay').classList.add('hidden');
-    document.getElementById('delete-overlay').classList.add('hidden');
-    document.getElementById('admin-overlay').classList.add('hidden');
+    // Cerrar todo primero con animación
+    animateCloseOverlay('form-overlay');
+    animateCloseOverlay('delete-overlay');
+    animateCloseOverlay('admin-overlay');
     editingId  = null;
     deletingId = null;
     // Liberar foco del mouse — único lugar donde se llama closeUI
@@ -160,7 +160,7 @@ function openEditModal(id) {
 }
 
 function closeFormModal() {
-    document.getElementById('form-overlay').classList.add('hidden');
+    animateCloseOverlay('form-overlay');
     editingId = null;
     // NO liberar foco — admin panel sigue abierto
 }
@@ -275,7 +275,7 @@ function openDeleteModal(id, name) {
 }
 
 function closeDeleteModal() {
-    document.getElementById('delete-overlay').classList.add('hidden');
+    animateCloseOverlay('delete-overlay');
     deletingId = null;
 }
 

@@ -123,8 +123,9 @@ RegisterNetEvent('ox_stash_store:openStash', function(pointId)
 
     -- Obtener inventarios
     local stashId = ('ox_stash_%d'):format(pointId)
-    local stashInv = exports.ox_inventory:GetInventory(stashId, false)
-    local playerInv = exports.ox_inventory:GetInventory(src, false)
+    local stashInv = exports.ox_inventory:GetInventory(stashId, false) or { items = {} }
+    local playerInv = exports.ox_inventory:GetInventory(src, false) or exports.ox_inventory:GetInventory(src, true) or { items = {} }
+    if not playerInv.items then playerInv.items = {} end
 
     -- Enviar datos al cliente para abrir UI custom
     TriggerClientEvent('ox_stash_store:openStashUI', src, point, stashInv, playerInv, Config.ImageConfig, Config.UIColors)
@@ -234,8 +235,9 @@ RegisterNetEvent('ox_stash_store:moveToStash', function(pointId, itemName, count
         exports.ox_inventory:AddItem(('ox_stash_%d'):format(pointId), itemName, count)
         Log_StashDeposit(player, point.name, pointId, itemName, count)
         -- Actualizar UI
-        local stashInv = exports.ox_inventory:GetInventory(('ox_stash_%d'):format(pointId), false)
-        local playerInv = exports.ox_inventory:GetInventory(src, false)
+        local stashInv = exports.ox_inventory:GetInventory(('ox_stash_%d'):format(pointId), false) or { items = {} }
+        local playerInv = exports.ox_inventory:GetInventory(src, false) or exports.ox_inventory:GetInventory(src, true) or { items = {} }
+        if not playerInv.items then playerInv.items = {} end
         TriggerClientEvent('ox_stash_store:updateStashUI', src, stashInv, playerInv, Config.ImageConfig, Config.UIColors)
     end
 end)
@@ -261,8 +263,9 @@ RegisterNetEvent('ox_stash_store:moveToPlayer', function(pointId, itemName, coun
         exports.ox_inventory:AddItem(src, itemName, count)
         Log_StashWithdraw(player, point.name, pointId, itemName, count)
         -- Actualizar UI
-        local stashInv = exports.ox_inventory:GetInventory(stashId, false)
-        local playerInv = exports.ox_inventory:GetInventory(src, false)
+        local stashInv = exports.ox_inventory:GetInventory(stashId, false) or { items = {} }
+        local playerInv = exports.ox_inventory:GetInventory(src, false) or exports.ox_inventory:GetInventory(src, true) or { items = {} }
+        if not playerInv.items then playerInv.items = {} end
         TriggerClientEvent('ox_stash_store:updateStashUI', src, stashInv, playerInv, Config.ImageConfig, Config.UIColors)
     end
 end)

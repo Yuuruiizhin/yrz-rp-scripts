@@ -130,12 +130,32 @@ function openShop(point, products) {
     currentShopPoint = point;
     document.getElementById('shop-title').textContent = point?.name || 'Tienda';
     renderProducts(products || []);
-    document.getElementById('shop-overlay').classList.remove('hidden');
+    const overlay = document.getElementById('shop-overlay');
+    overlay.classList.remove('hidden', 'hiding');
+    overlay.querySelector('.panel')?.classList.remove('hiding');
+}
+
+function animateCloseOverlay(overlayId) {
+    const overlay = document.getElementById(overlayId);
+    if (!overlay || overlay.classList.contains('hidden')) return;
+    const panel = overlay.querySelector('.panel, .modal');
+
+    overlay.classList.add('hiding');
+    if (panel) panel.classList.add('hiding');
+
+    const onEnd = () => {
+        overlay.classList.remove('hiding');
+        overlay.classList.add('hidden');
+        if (panel) panel.classList.remove('hiding');
+        overlay.removeEventListener('animationend', onEnd);
+    };
+
+    overlay.addEventListener('animationend', onEnd);
 }
 
 function closeShop() {
-    document.getElementById('shop-overlay').classList.add('hidden');
-    document.getElementById('qty-overlay').classList.add('hidden');
+    animateCloseOverlay('shop-overlay');
+    animateCloseOverlay('qty-overlay');
     currentShopPoint = null;
     currentProduct   = null;
     nuiPost('closeUI');
@@ -185,11 +205,13 @@ function openQtyModal(prod) {
     document.getElementById('qty-subtitle').textContent = `Precio unitario: $${prod.price}`;
     document.getElementById('qty-input').value          = 1;
     updateQtyTotal();
-    document.getElementById('qty-overlay').classList.remove('hidden');
+    const overlay = document.getElementById('qty-overlay');
+    overlay.classList.remove('hidden', 'hiding');
+    overlay.querySelector('.modal')?.classList.remove('hiding');
 }
 
 function closeQtyModal() {
-    document.getElementById('qty-overlay').classList.add('hidden');
+    animateCloseOverlay('qty-overlay');
     currentProduct = null;
 }
 
@@ -220,7 +242,9 @@ function openStash(point, stashInv, playerInv) {
     document.getElementById('stash-title').textContent = point && point.name ? point.name : 'Almacén';
     renderStashItems(stashInv || { items: [] });
     renderPlayerItems(playerInv || { items: [] });
-    document.getElementById('stash-overlay').classList.remove('hidden');
+    const overlay = document.getElementById('stash-overlay');
+    overlay.classList.remove('hidden', 'hiding');
+    overlay.querySelector('.panel')?.classList.remove('hiding');
 }
 
 function updateStash(stashInv, playerInv) {
@@ -229,9 +253,16 @@ function updateStash(stashInv, playerInv) {
 }
 
 function closeStash() {
-    document.getElementById('stash-overlay').classList.add('hidden');
+    animateCloseOverlay('stash-overlay');
     currentStashPoint = null;
     nuiPost('closeUI');
+}
+
+function closeStashQtyModal() {
+    animateCloseOverlay('stash-qty-overlay');
+    currentTransferItem = null;
+    currentTransferDirection = null;
+    currentTransferMax = 0;
 }
 
 function renderStashItems(inventory) {
@@ -245,7 +276,7 @@ function renderStashItems(inventory) {
 
     items.forEach(item => {
         if (!item) return;
-        const count = item.count != null ? item.count : (item.amount != null ? item.amount : 0);
+        const count = item.count != null ? item.count : (item.amount != null ? item.amount : (item.quantity != null ? item.quantity : 0));
         if (count <= 0) return;
 
         const card = document.createElement('div');
@@ -271,7 +302,7 @@ function renderPlayerItems(inventory) {
 
     items.forEach(item => {
         if (!item) return;
-        const count = item.count != null ? item.count : (item.amount != null ? item.amount : 0);
+        const count = item.count != null ? item.count : (item.amount != null ? item.amount : (item.quantity != null ? item.quantity : 0));
         if (count <= 0) return;
 
         const card = document.createElement('div');
@@ -304,14 +335,9 @@ function openMoveModal(item, direction, maxCount) {
 
     synchronizeDefaultQty();
 
-    document.getElementById('stash-qty-overlay').classList.remove('hidden');
-}
-
-function closeStashQtyModal() {
-    document.getElementById('stash-qty-overlay').classList.add('hidden');
-    currentTransferItem = null;
-    currentTransferDirection = null;
-    currentTransferMax = 0;
+    const overlay = document.getElementById('stash-qty-overlay');
+    overlay.classList.remove('hidden', 'hiding');
+    overlay.querySelector('.modal')?.classList.remove('hiding');
 }
 
 function changeStashQty(delta) {
